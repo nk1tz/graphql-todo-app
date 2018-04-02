@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { gql } from 'apollo-boost'
-import { Query } from 'react-apollo'
+import { Query, Mutation } from 'react-apollo'
 import logo from './logo.svg'
 import './App.css'
 
@@ -12,9 +12,13 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
+        <div>Signup</div>
+        <span>
+          Email<input type="text" />
+        </span>
+        <span>
+          Password<input type="password" />
+        </span>
       </div>
     )
   }
