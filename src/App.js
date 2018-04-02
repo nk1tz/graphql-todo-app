@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { gql } from 'apollo-boost'
 import { Query, Mutation } from 'react-apollo'
-import logo from './logo.svg'
-import './App.css'
+import styled from 'styled-components'
 
 const GET_TODOS = gql`
   {
@@ -14,29 +13,54 @@ const GET_TODOS = gql`
   }
 `
 
+const TOGGLE_TODO = gql`
+  mutation toggleTodo($id: ID!, $completed: Boolean!) {
+    updateTodo(id: $id, completed: $completed) {
+      id
+      completed
+    }
+  }
+`
+
+const Todo = ({ id, text, completed }) => (
+  <Mutation mutation={TOGGLE_TODO} variables={{ id, completed }}>
+    {toggleTodo => (
+      <div key={id}>
+        <p onClick={() => toggleTodo(id, !completed)}>{text}</p>
+      </div>
+    )}
+  </Mutation>
+)
+
 const Loading = () => <span>Loading...</span>
+
+const Todos = () => (
+  <Query query={GET_TODOS}>
+    {({ data, error, loading }) =>
+      loading ? <Loading /> : data.allTodoes.map(todo => <Todo key={todo.id} {...todo} />)
+    }
+  </Query>
+)
+
+const AppShell = styled.div`
+  text-align: center;
+`
+const AppHeader = styled.header`
+  background-color: #222;
+  height: 80px;
+  padding: 20px;
+  color: white;
+`
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Todo list</h1>
-        </header>
-        <Query query={GET_TODOS}>
-          {({ data, error, loading }) =>
-            loading ? <Loading /> : data.allTodoes.map(todo => <div key={todo.id}>{todo.text}</div>)
-          }
-        </Query>
-        {/* <div>Signup</div>
-        <span>
-          Email<input type="text" />
-        </span>
-        <span>
-          Password<input type="password" />
-        </span> */}
-      </div>
+      <AppShell>
+        <AppHeader>
+          <h1>Todo list</h1>
+        </AppHeader>
+        <Todos />
+      </AppShell>
     )
   }
 }

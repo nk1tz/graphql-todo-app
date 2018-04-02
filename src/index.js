@@ -2,35 +2,21 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
-import './index.css'
+import { injectGlobal } from 'styled-components'
 import App from './App'
 import registerServiceWorker from './registerServiceWorker'
 
-const typeDefs = `
-  type Todo {
-    id: Int!
-    text: String!
-    completed: Boolean!
-  }
-  type Mutation {
-    addTodo(text: String!): Todo
-    toggleTodo(id: Int!): Todo
-  }
-  type Query {
-    visibilityFilter: String
-    todos: [Todo]
-  }
-`
-
 const client = new ApolloClient({
   uri: 'https://api.graph.cool/simple/v1/cjfhppt8q51la0124ei84j8r3',
-  fetchOptions: {
-    credentials: 'include',
-  },
-  clientState: {
-    typeDefs,
-  },
 })
+
+injectGlobal`
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+  }
+`
 
 const ApolloApp = () => (
   <ApolloProvider client={client}>
