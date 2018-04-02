@@ -17,8 +17,8 @@ const ADD_TODO = gql`
   mutation($text: String!, $completed: Boolean!) {
     createTodo(text: $text, completed: $completed) {
       id
-      completed
       text
+      completed
     }
   }
 `
@@ -26,20 +26,14 @@ const ADD_TODO = gql`
 const TodoForm = ({ text, completed }) => (
   <Mutation
     mutation={ADD_TODO}
-    optimisticResponse={{
-      __typename: 'Mutation',
-      createTodo: {
-        id: '',
-        text: text,
-        completed: completed,
-      },
-    }}
-    update={(cache, { data: { createTodo } }) => {
-      const { allTodoes } = cache.readQuery({ query: GET_TODOS })
-      cache.writeQuery({
-        query: GET_TODOS,
-        data: { allTodoes: allTodoes.concat([createTodo]) },
-      })
+    update={(proxy, { data: { createTodo } }) => {
+      console.log(createTodo)
+      // Read the data from our cache for this query.
+      const data = proxy.readQuery({ query: GET_TODOS })
+      // Add our comment from the mutation to the end.
+      data.allTodoes.push(createTodo)
+      // Write our data back to the cache.
+      proxy.writeQuery({ query: GET_TODOS, data })
     }}
   >
     {addTodo => {
@@ -48,7 +42,18 @@ const TodoForm = ({ text, completed }) => (
         <form
           onSubmit={e => {
             e.preventDefault()
-            addTodo({ variables: { text: input.value, completed: false } })
+            addTodo({
+              variables: { text: input.value, completed: false },
+              optimisticResponse: {
+                __typename: 'Mutation',
+                createTodo: {
+                  __typename: 'Todo',
+                  id: '',
+                  text: input.value,
+                  completed: false,
+                },
+              },
+            })
             input.value = ''
           }}
         >
