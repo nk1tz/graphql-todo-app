@@ -26,14 +26,14 @@ const ADD_TODO = gql`
 const TodoForm = ({ text, completed }) => (
   <Mutation
     mutation={ADD_TODO}
-    update={(proxy, { data: { createTodo } }) => {
+    update={(cache, { data: { createTodo } }) => {
       console.log(createTodo)
       // Read the data from our cache for this query.
-      const data = proxy.readQuery({ query: GET_TODOS })
+      const data = cache.readQuery({ query: GET_TODOS })
       // Add our comment from the mutation to the end.
       data.allTodoes.push(createTodo)
       // Write our data back to the cache.
-      proxy.writeQuery({ query: GET_TODOS, data })
+      cache.writeQuery({ query: GET_TODOS, data })
     }}
   >
     {addTodo => {
